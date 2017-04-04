@@ -23,6 +23,9 @@ for url in urlList:
     html = urlopen(url)
 
     bsObj = BeautifulSoup(html.read(), "html.parser")
-    print(bsObj.h1)
 
-    print("\n")
+    if url.find("daum") > 0:
+        newsTop = bsObj.find(id="channel_news1_top")
+        print(newsTop)
+
+    print("")
