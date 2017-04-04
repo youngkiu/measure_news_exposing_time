@@ -1,13 +1,14 @@
 from urllib.request import urlopen
+from bs4 import BeautifulSoup
 
-url = ("http://m.daum.net/", "http://m.naver.com/")
+urlList = ("http://m.daum.net/", "http://m.naver.com/")
 
-for i in range(0, len(url)):
-    print("Open", url[i])
+for url in urlList:
+    print("Open", url)
 
-    html = urlopen(url[i])
+    html = urlopen(url)
 
-    filename = url[i]
+    filename = url
     filename = filename.replace("/", "")
     filename = filename.replace("http:", "")
     filename = filename.replace("https:", "")
@@ -18,3 +19,10 @@ for i in range(0, len(url)):
     file = open(filename, 'wt')
     file.write(html.read().decode('utf-8'))
     file.close()
+
+    html = urlopen(url)
+
+    bsObj = BeautifulSoup(html.read(), "html.parser")
+    print(bsObj.h1)
+
+    print("\n")
