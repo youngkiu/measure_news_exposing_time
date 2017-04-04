@@ -26,6 +26,13 @@ for url in urlList:
 
     if url.find("daum") > 0:
         newsTop = bsObj.find(id="channel_news1_top")
-        print(newsTop)
+        newsItems = newsTop.div.ul
+        newsText = newsItems.get_text()
+        newsArray = newsText.splitlines()
+        newsTitle = []
+        for news in newsArray:
+            if (news + ' ').isspace() == False:
+                newsTitle.append(news)
+                print(news)
 
     print("")
