@@ -25,7 +25,7 @@ def checkDaumNews(newsDic):
     html = urlopen(url)
     bsObj = BeautifulSoup(html.read(), "html.parser")
 
-    newsTop = bsObj.div.find(id="channel_news1_top")
+    newsTop = bsObj.find(id="channel_news1_top")
     newsItems = newsTop.div.ul
     newsText = newsItems.get_text()
     newsArray = newsText.splitlines()
@@ -45,6 +45,22 @@ def checkNaverNews(newsDic):
 
     html = urlopen(url)
     bsObj = BeautifulSoup(html.read(), "html.parser")
+
+    newsTop = bsObj.find(id="_MM_FLICK_FIRST_PANEL")
+    newsItems = newsTop.div.ul
+    newsText = newsItems.get_text()
+    newsArray = newsText.splitlines()
+    for news in newsArray:
+        if (news + ' ').isspace() == False and \
+            news.find('브리핑') != 0 and \
+            news.find('전국날씨') != 0:
+            if news in newsDic.keys():
+                value = newsDic.pop(news)
+                value += 1
+            else:
+                value = 1
+            newsDic[news] = value
+    
 
 daumNews = {}
 naverNews = {}
@@ -81,7 +97,6 @@ def onTimer():
     print("")
 
 
-print("Program Start")
-onTimer()
-print("Program End")
+if __name__ == '__main__':
+    onTimer()
 
