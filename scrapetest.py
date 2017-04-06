@@ -1,3 +1,10 @@
+__author__ = "Youngki LYU"
+__copyright__ = "Copyright 2017, Youngki LYU"
+__license__ = "GPL"
+__version__ = "1.0"
+__email__ = "youngkiu@gmail.com"
+
+
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
