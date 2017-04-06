@@ -22,6 +22,29 @@ def saveWebPage(url):
     file.write(urlopen(url).read())
     file.close()
 
+def updateNewNews(newsDic, newsKey):
+    newsKey = newsKey.strip()
+    if (newsKey + ' ').isspace() == False and \
+        newsKey.find('브리핑') != 0 and \
+        newsKey.find('전국날씨') != 0 and \
+        newsKey.find('전국 날씨') != 0 and \
+        newsKey.find('속보') != 0 and \
+        newsKey.find('조간 1면') != 0 and \
+        newsKey.find('날씨') != 0 and \
+        newsKey.find('이시각 전국 날씨') != 0:
+        if newsKey in newsDic.keys():
+            newsValue = newsDic.pop(newsKey)
+            newsValue += 1
+        else:
+            newsValue = 1
+        newsDic[newsKey] = newsValue
+
+        numOfUpdatedNews = 1
+    else:
+        numOfUpdatedNews = 0
+
+    return numOfUpdatedNews
+
 def removeOldMinValue(newsDic, numOfLatestNews):
     global DATABASE_MAX_SIZE
     
@@ -60,25 +83,14 @@ def checkDaumNews(newsDic):
     html = urlopen(url)
     bsObj = BeautifulSoup(html.read(), "html.parser")
 
-    numOfLatestNews = 0
-
     newsTop = bsObj.find(id="channel_news1_top")
     newsItems = newsTop.div.ul
     newsText = newsItems.get_text()
     newsArray = newsText.splitlines()
-    for news in newsArray:
-        news = news.strip()
-        if (news + ' ').isspace() == False and \
-            news.find('전국날씨') != 0 and \
-            news.find('전국 날씨') != 0:
-            if news in newsDic.keys():
-                value = newsDic.pop(news)
-                value += 1
-            else:
-                value = 1
-            newsDic[news] = value
 
-            numOfLatestNews += 1
+    numOfLatestNews = 0
+    for news in newsArray:
+        numOfLatestNews += updateNewNews(newsDic, news)
 
     removeOldMinValue(newsDic, numOfLatestNews)
 
@@ -87,8 +99,6 @@ def checkNaverNews(newsDic):
     
     saveWebPage(url)
 
-    numOfLatestNews = 0
-
     html = urlopen(url)
     bsObj = BeautifulSoup(html.read(), "html.parser")
 
@@ -96,23 +106,10 @@ def checkNaverNews(newsDic):
     newsItems = newsTop.div.ul
     newsText = newsItems.get_text()
     newsArray = newsText.splitlines()
+
+    numOfLatestNews = 0
     for news in newsArray:
-        news = news.strip()
-        if (news + ' ').isspace() == False and \
-            news.find('브리핑') != 0 and \
-            news.find('전국날씨') != 0 and \
-            news.find('속보') != 0 and \
-            news.find('조간 1면') != 0 and \
-            news.find('날씨') != 0 and \
-            news.find('이시각 전국 날씨') != 0:
-            if news in newsDic.keys():
-                value = newsDic.pop(news)
-                value += 1
-            else:
-                value = 1
-            newsDic[news] = value
-    
-            numOfLatestNews += 1
+        numOfLatestNews += updateNewNews(newsDic, news)
 
     removeOldMinValue(newsDic, numOfLatestNews)
 
