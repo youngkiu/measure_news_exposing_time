@@ -6,7 +6,7 @@ import sys
 import datetime
 
 
-DATABASE_MAX_SIZE = 20
+DATABASE_MAX_SIZE = 25
 CHECKING_TIMER_PERIOD = 30 * 1
 
 def saveWebPage(url):
@@ -22,7 +22,7 @@ def saveWebPage(url):
     file.write(urlopen(url).read())
     file.close()
 
-def removeMinValue(newsDic, numOfLatestNews):
+def removeOldMinValue(newsDic, numOfLatestNews):
     global DATABASE_MAX_SIZE
     
     numOfNews = 0
@@ -30,11 +30,17 @@ def removeMinValue(newsDic, numOfLatestNews):
         numOfNews += 1
 
     if numOfNews > DATABASE_MAX_SIZE:
+        guardRegion = numOfLatestNews * 2
+        if guardRegion >= DATABASE_MAX_SIZE:
+            print("Error", numOfLatestNews)
+            return
+        
         itemIndex = 0
+        removeRegion = numOfNews - guardRegion
         minValue = sys.maxsize
         for value in newsDic.values():
             itemIndex += 1
-            if itemIndex > (numOfNews - numOfLatestNews):
+            if itemIndex > removeRegion:
                 break
             
             if minValue > value:
@@ -61,7 +67,10 @@ def checkDaumNews(newsDic):
     newsText = newsItems.get_text()
     newsArray = newsText.splitlines()
     for news in newsArray:
-        if (news + ' ').isspace() == False:
+        news = news.strip()
+        if (news + ' ').isspace() == False and \
+            news.find('전국날씨') != 0 and \
+            news.find('전국 날씨') != 0:
             if news in newsDic.keys():
                 value = newsDic.pop(news)
                 value += 1
@@ -71,7 +80,7 @@ def checkDaumNews(newsDic):
 
             numOfLatestNews += 1
 
-    removeMinValue(newsDic, numOfLatestNews)
+    removeOldMinValue(newsDic, numOfLatestNews)
 
 def checkNaverNews(newsDic):
     url = "http://m.naver.com/"
@@ -88,10 +97,14 @@ def checkNaverNews(newsDic):
     newsText = newsItems.get_text()
     newsArray = newsText.splitlines()
     for news in newsArray:
+        news = news.strip()
         if (news + ' ').isspace() == False and \
             news.find('브리핑') != 0 and \
             news.find('전국날씨') != 0 and \
-            news.find('속보') != 0:
+            news.find('속보') != 0 and \
+            news.find('조간 1면') != 0 and \
+            news.find('날씨') != 0 and \
+            news.find('이시각 전국 날씨') != 0:
             if news in newsDic.keys():
                 value = newsDic.pop(news)
                 value += 1
@@ -101,7 +114,7 @@ def checkNaverNews(newsDic):
     
             numOfLatestNews += 1
 
-    removeMinValue(newsDic, numOfLatestNews)
+    removeOldMinValue(newsDic, numOfLatestNews)
 
 
 daumNews = {}
