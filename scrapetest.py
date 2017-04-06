@@ -19,7 +19,14 @@ def saveWebPage(url):
     print("Write", filename)
 
     file = open(filename, 'wb')
-    file.write(urlopen(url).read())
+
+    try:
+        html = urlopen(url)
+    except Exception as err:
+        print(err)
+    else:
+        file.write(html.read())
+    
     file.close()
 
 def removeOldMinValue(newsDic, numOfLatestNews):
@@ -86,30 +93,38 @@ def checkDaumNews(newsDic):
     
     saveWebPage(url)
 
-    html = urlopen(url)
-    bsObj = BeautifulSoup(html.read(), "html.parser")
+    try:
+        html = urlopen(url)
+    except Exception as err:
+        print(err)
+    else:
+        bsObj = BeautifulSoup(html.read(), "html.parser")
 
-    newsTop = bsObj.find(id="channel_news1_top")
-    newsItems = newsTop.div.ul
-    newsText = newsItems.get_text()
-    newsArray = newsText.splitlines()
+        newsTop = bsObj.find(id="channel_news1_top")
+        newsItems = newsTop.div.ul
+        newsText = newsItems.get_text()
+        newsArray = newsText.splitlines()
 
-    updateNewNews(newsDic, newsArray)
+        updateNewNews(newsDic, newsArray)
 
 def checkNaverNews(newsDic):
     url = "http://m.naver.com/"
     
     saveWebPage(url)
 
-    html = urlopen(url)
-    bsObj = BeautifulSoup(html.read(), "html.parser")
+    try:
+        html = urlopen(url)
+    except Exception as err:
+        print(err)
+    else:
+        bsObj = BeautifulSoup(html.read(), "html.parser")
 
-    newsTop = bsObj.find(id="_MM_FLICK_FIRST_PANEL")
-    newsItems = newsTop.div.ul
-    newsText = newsItems.get_text()
-    newsArray = newsText.splitlines()
+        newsTop = bsObj.find(id="_MM_FLICK_FIRST_PANEL")
+        newsItems = newsTop.div.ul
+        newsText = newsItems.get_text()
+        newsArray = newsText.splitlines()
 
-    updateNewNews(newsDic, newsArray)
+        updateNewNews(newsDic, newsArray)
 
 
 daumNews = {}
