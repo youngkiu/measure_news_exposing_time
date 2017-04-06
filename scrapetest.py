@@ -22,45 +22,23 @@ def saveWebPage(url):
     file.write(urlopen(url).read())
     file.close()
 
-def updateNewNews(newsDic, newsKey):
-    newsKey = newsKey.strip()
-    if (newsKey + ' ').isspace() == False and \
-        newsKey.find('브리핑') != 0 and \
-        newsKey.find('전국날씨') != 0 and \
-        newsKey.find('전국 날씨') != 0 and \
-        newsKey.find('속보') != 0 and \
-        newsKey.find('조간 1면') != 0 and \
-        newsKey.find('날씨') != 0 and \
-        newsKey.find('이시각 전국 날씨') != 0:
-        if newsKey in newsDic.keys():
-            newsValue = newsDic.pop(newsKey)
-            newsValue += 1
-        else:
-            newsValue = 1
-        newsDic[newsKey] = newsValue
-
-        numOfUpdatedNews = 1
-    else:
-        numOfUpdatedNews = 0
-
-    return numOfUpdatedNews
-
 def removeOldMinValue(newsDic, numOfLatestNews):
     global DATABASE_MAX_SIZE
+
+    guardRegion = numOfLatestNews * 2
+    if guardRegion >= DATABASE_MAX_SIZE:
+        print("Error", numOfLatestNews)
+        return
     
     numOfNews = 0
     for item in newsDic.items():
         numOfNews += 1
 
-    if numOfNews > DATABASE_MAX_SIZE:
-        guardRegion = numOfLatestNews * 2
-        if guardRegion >= DATABASE_MAX_SIZE:
-            print("Error", numOfLatestNews)
-            return
-        
+    while numOfNews > DATABASE_MAX_SIZE:
         itemIndex = 0
         removeRegion = numOfNews - guardRegion
         minValue = sys.maxsize
+
         for value in newsDic.values():
             itemIndex += 1
             if itemIndex > removeRegion:
@@ -75,6 +53,34 @@ def removeOldMinValue(newsDic, numOfLatestNews):
 
         newsDic.pop(key)
 
+        numOfNews -= 1
+
+def updateNewNews(newsDic, newsArray):
+    numOfLatestNews = 0
+
+    for newsKey in newsArray:
+        newsKey = newsKey.strip()
+        if (newsKey + ' ').isspace() == False and \
+            newsKey.find('브리핑') != 0 and \
+            newsKey.find('전국날씨') != 0 and \
+            newsKey.find('전국 날씨') != 0 and \
+            newsKey.find('속보') != 0 and \
+            newsKey.find('조간 1면') != 0 and \
+            newsKey.find('날씨') != 0 and \
+            newsKey.find('이시각 전국 날씨') != 0 and \
+            newsKey.find('문답') != 0:
+            if newsKey in newsDic.keys():
+                newsValue = newsDic.pop(newsKey)
+                newsValue += 1
+            else:
+                newsValue = 1
+            newsDic[newsKey] = newsValue
+
+            numOfLatestNews += 1
+
+    if numOfLatestNews > 0:
+        removeOldMinValue(newsDic, numOfLatestNews)
+
 def checkDaumNews(newsDic):
     url = "http://m.daum.net/"
     
@@ -88,11 +94,7 @@ def checkDaumNews(newsDic):
     newsText = newsItems.get_text()
     newsArray = newsText.splitlines()
 
-    numOfLatestNews = 0
-    for news in newsArray:
-        numOfLatestNews += updateNewNews(newsDic, news)
-
-    removeOldMinValue(newsDic, numOfLatestNews)
+    updateNewNews(newsDic, newsArray)
 
 def checkNaverNews(newsDic):
     url = "http://m.naver.com/"
@@ -107,11 +109,7 @@ def checkNaverNews(newsDic):
     newsText = newsItems.get_text()
     newsArray = newsText.splitlines()
 
-    numOfLatestNews = 0
-    for news in newsArray:
-        numOfLatestNews += updateNewNews(newsDic, news)
-
-    removeOldMinValue(newsDic, numOfLatestNews)
+    updateNewNews(newsDic, newsArray)
 
 
 daumNews = {}
@@ -139,12 +137,12 @@ def onTimer():
 
     print("Accumulated time of Daum news")
     for news in daumNews:
-        print(daumNews[news], news)
+        print("{count:3d} {newsTitle}".format(count=daumNews[news], newsTitle=news))
     print("")
 
     print("Accumulated time of Naver news")
     for news in naverNews:
-        print(naverNews[news], news)
+        print("{count:3d} {newsTitle}".format(count=naverNews[news], newsTitle=news))
     print("")
 
 
