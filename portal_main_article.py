@@ -69,8 +69,8 @@ def removeOldMinValue(newsDic, numOfLatestNews):
 
         numOfNews -= 1
 
-def updateNewNews(newsDic, newsText):
-    numOfLatestNews = 0
+def buildNewsTitle(newsText):
+    newsTitles = []
 
     newsArray = newsText.splitlines()
     newsIter = iter(newsArray)
@@ -82,16 +82,21 @@ def updateNewNews(newsDic, newsText):
                 if (newsNext + ' ').isspace() == False:
                     news = "{0} {1}".format(news, next(newsIter))
 
-            news = news.strip()
-            if news in newsDic.keys():
-                newsValue = newsDic.pop(news)
-                newsValue += 1
-            else:
-                newsValue = 1
-            newsDic[news] = newsValue
+            newsTitles.append(news.strip())
 
-            numOfLatestNews += 1
+    return newsTitles
 
+def updateNewNews(newsDic, newsTitles):
+    for newsKey in newsTitles:
+        if newsKey in newsDic.keys():
+           newsValue = newsDic.pop(newsKey)
+           newsValue += 1
+        else:
+           newsValue = 1
+
+        newsDic[newsKey] = newsValue
+
+    numOfLatestNews = len(newsTitles)
     if numOfLatestNews > 0:
         removeOldMinValue(newsDic, numOfLatestNews)
 
@@ -111,7 +116,8 @@ def checkDaumNews(newsDic):
         newsItems = newsTop.div.ul
         newsText = newsItems.get_text()
 
-        updateNewNews(newsDic, newsText)
+        newsTitles = buildNewsTitle(newsText)
+        updateNewNews(newsDic, newsTitles)
 
 def checkNaverNews(newsDic):
     url = "http://m.naver.com/"
@@ -129,7 +135,8 @@ def checkNaverNews(newsDic):
         newsItems = newsTop.div.ul
         newsText = newsItems.get_text()
 
-        updateNewNews(newsDic, newsText)
+        newsTitles = buildNewsTitle(newsText)
+        updateNewNews(newsDic, newsTitles)
 
 
 daumNews = {}
