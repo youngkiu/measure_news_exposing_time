@@ -69,26 +69,26 @@ def removeOldMinValue(newsDic, numOfLatestNews):
 
         numOfNews -= 1
 
-def updateNewNews(newsDic, newsArray):
+def updateNewNews(newsDic, newsText):
     numOfLatestNews = 0
 
-    for newsKey in newsArray:
-        newsKey = newsKey.strip()
-        if (newsKey + ' ').isspace() == False and \
-            newsKey.find('브리핑') != 0 and \
-            newsKey.find('전국날씨') != 0 and \
-            newsKey.find('전국 날씨') != 0 and \
-            newsKey.find('속보') != 0 and \
-            newsKey.find('조간 1면') != 0 and \
-            newsKey.find('날씨') != 0 and \
-            newsKey.find('이시각 전국 날씨') != 0 and \
-            newsKey.find('문답') != 0:
-            if newsKey in newsDic.keys():
-                newsValue = newsDic.pop(newsKey)
+    newsArray = newsText.splitlines()
+    newsIter = iter(newsArray)
+
+    for news in newsIter:
+        if (news + ' ').isspace() == False:
+            if news != newsArray[-1]:
+                newsNext = newsArray[newsArray.index(news)+1]
+                if (newsNext + ' ').isspace() == False:
+                    news = "{0} {1}".format(news, next(newsIter))
+
+            news = news.strip()
+            if news in newsDic.keys():
+                newsValue = newsDic.pop(news)
                 newsValue += 1
             else:
                 newsValue = 1
-            newsDic[newsKey] = newsValue
+            newsDic[news] = newsValue
 
             numOfLatestNews += 1
 
@@ -105,14 +105,13 @@ def checkDaumNews(newsDic):
     except Exception as err:
         print(err)
     else:
-        bsObj = BeautifulSoup(html.read(), "html.parser")
+        bsObj = BeautifulSoup(html, "html.parser")
 
         newsTop = bsObj.find(id="channel_news1_top")
         newsItems = newsTop.div.ul
         newsText = newsItems.get_text()
-        newsArray = newsText.splitlines()
 
-        updateNewNews(newsDic, newsArray)
+        updateNewNews(newsDic, newsText)
 
 def checkNaverNews(newsDic):
     url = "http://m.naver.com/"
@@ -124,14 +123,13 @@ def checkNaverNews(newsDic):
     except Exception as err:
         print(err)
     else:
-        bsObj = BeautifulSoup(html.read(), "html.parser")
+        bsObj = BeautifulSoup(html, "html.parser")
 
         newsTop = bsObj.find(id="_MM_FLICK_FIRST_PANEL")
         newsItems = newsTop.div.ul
         newsText = newsItems.get_text()
-        newsArray = newsText.splitlines()
 
-        updateNewNews(newsDic, newsArray)
+        updateNewNews(newsDic, newsText)
 
 
 daumNews = {}
