@@ -96,9 +96,7 @@ def updateNewNews(newsDic, newsTitles):
 
         newsDic[newsKey] = newsValue
 
-    numOfLatestNews = len(newsTitles)
-    if numOfLatestNews > 0:
-        removeOldMinValue(newsDic, numOfLatestNews)
+    removeOldMinValue(newsDic, len(newsTitles))
 
 def checkDaumNews(newsDic):
     url = "http://m.daum.net/"
@@ -117,7 +115,8 @@ def checkDaumNews(newsDic):
         newsText = newsItems.get_text()
 
         newsTitles = buildNewsTitle(newsText)
-        updateNewNews(newsDic, newsTitles)
+        if len(newsTitles) > 0:
+            updateNewNews(newsDic, newsTitles)
 
 def checkNaverNews(newsDic):
     url = "http://m.naver.com/"
@@ -136,7 +135,8 @@ def checkNaverNews(newsDic):
         newsText = newsItems.get_text()
 
         newsTitles = buildNewsTitle(newsText)
-        updateNewNews(newsDic, newsTitles)
+        if len(newsTitles) > 0:
+            updateNewNews(newsDic, newsTitles)
 
 
 daumNews = {}
