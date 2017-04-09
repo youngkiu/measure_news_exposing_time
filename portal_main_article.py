@@ -13,7 +13,7 @@ import sys
 import datetime
 
 
-DATABASE_MAX_SIZE = 25
+DATABASE_MAX_SIZE = 20
 CHECKING_TIMER_PERIOD = 30 * 1
 
 def saveWebPage(url):
@@ -164,12 +164,12 @@ def onTimer():
 
     print("Accumulated time of Daum news")
     for news in daumNews:
-        print("{count:3d} {newsTitle}".format(count=daumNews[news], newsTitle=news))
+        print("{count:4d} {newsTitle}".format(count=daumNews[news], newsTitle=news))
     print("")
 
     print("Accumulated time of Naver news")
     for news in naverNews:
-        print("{count:3d} {newsTitle}".format(count=naverNews[news], newsTitle=news))
+        print("{count:4d} {newsTitle}".format(count=naverNews[news], newsTitle=news))
     print("")
 
 
