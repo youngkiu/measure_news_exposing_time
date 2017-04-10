@@ -70,19 +70,56 @@ def removeOldMinValue(newsDic, numOfLatestNews):
         numOfNews -= 1
 
 def buildNewsTitle(newsText):
-    newsTitles = []
+    LAST_STRING = "Last String"
 
     newsArray = newsText.splitlines()
+    newsArray.append(LAST_STRING)
+
+    newsTitles = []
     newsIter = iter(newsArray)
 
-    for news in newsIter:
-        if (news + ' ').isspace() == False:
-            if news != newsArray[-1]:
-                newsNext = newsArray[newsArray.index(news)+1]
-                if (newsNext + ' ').isspace() == False:
-                    news = "{0} {1}".format(news, next(newsIter))
+    news = newsArray[0]
+    while news != LAST_STRING:
+        newsTitle = news.strip()
 
-            newsTitles.append(news.strip())
+        if len(newsTitle) > 0:
+            if len(newsTitle) < 10:
+                newsIndex = newsArray.index(news)
+                prevDist = 0
+
+                while newsIndex != 0:
+                    newsIndex -= 1
+                    prevDist += 1
+
+                    #print("prev", newsIndex, prevDist)
+                    if len(newsArray[newsIndex].strip()) > 0:
+                        prevDist -= len(newsArray)
+                        break
+
+                newsIndex = newsArray.index(news)
+                nextDist = 0
+                while newsIndex != (newsArray.index(LAST_STRING) - 1):
+                    newsIndex += 1
+                    nextDist += 1
+
+                    #print("next", newsIndex, nextDist)
+                    if len(newsArray[newsIndex].strip()) > 0:
+                        nextDist -= len(newsArray)
+                        break
+
+                #print(prevDist, nextDist)
+                if prevDist >= 0 and nextDist >= 0:
+                    newsTitles.append(news.strip())
+                else:
+                    if prevDist < nextDist:
+                        newsTitles[-1] = "{0} | {1}".format(newsTitles[-1], newsTitle)
+                    else:
+                        newsTitles.append("{0} | {1}".format(newsTitle, next(newsIter)))
+
+            else:
+                newsTitles.append(news.strip())
+
+        news = next(newsIter)
 
     return newsTitles
 
