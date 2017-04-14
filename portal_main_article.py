@@ -69,8 +69,62 @@ def removeOldMinValue(newsDic, numOfLatestNews):
 
         numOfNews -= 1
 
+LAST_STRING = "Last String"
+
+def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
+    global LAST_STRING
+    newsIndex = newsArray.index(news)
+    prevDist = 0
+
+    while newsIndex != 0:
+        newsIndex -= 1
+        prevDist += 1
+
+        #print("prev", newsIndex, prevDist)
+        if len(newsArray[newsIndex].strip()) > 0:
+            prevDist -= len(newsArray)
+            prevNews = newsArray[newsIndex]
+            break
+
+    newsIndex = newsArray.index(news)
+    nextDist = 0
+    while newsIndex != (newsArray.index(LAST_STRING) - 1):
+        newsIndex += 1
+        nextDist += 1
+
+        #print("next", newsIndex, nextDist)
+        if len(newsArray[newsIndex].strip()) > 0:
+            nextDist -= len(newsArray)
+            nextNews = newsArray[newsIndex]
+            break
+
+    newsTitle = news.strip()
+
+    #print(prevDist, nextDist)
+    if prevDist >= 0 and nextDist >= 0:
+        concatenatedNewsTitle = newsTitle
+    else:
+        if prevDist < nextDist:
+            concatenatedNewsTitle = "{0} | {1}".format(newsTitles.pop(), newsTitle)
+        else:
+            newsIndex = newsArray.index(news)
+            while newsIndex != (newsArray.index(LAST_STRING) - 1):
+                nextNews = next(newsIter)
+
+                if len(newsArray[newsIndex].strip()) > 0:
+                    break
+
+            nextNewsTitle = nextNews.strip()
+
+            if len(nextNewsTitle) < 10:
+                concatenatedNewsTitle = "{0} | {1}".format(newsTitle, concatenateNewsTitle(nextNews, newsArray, newsIter, newsTitles))
+            else:
+                concatenatedNewsTitle = "{0} | {1}".format(newsTitle, nextNewsTitle)
+
+    return concatenatedNewsTitle
+
 def buildNewsTitle(newsText):
-    LAST_STRING = "Last String"
+    global LAST_STRING
 
     newsArray = newsText.splitlines()
     newsArray.append(LAST_STRING)
@@ -84,40 +138,9 @@ def buildNewsTitle(newsText):
 
         if len(newsTitle) > 0:
             if len(newsTitle) < 10:
-                newsIndex = newsArray.index(news)
-                prevDist = 0
+                newsTitle = concatenateNewsTitle(news, newsArray, newsIter, newsTitles)
 
-                while newsIndex != 0:
-                    newsIndex -= 1
-                    prevDist += 1
-
-                    #print("prev", newsIndex, prevDist)
-                    if len(newsArray[newsIndex].strip()) > 0:
-                        prevDist -= len(newsArray)
-                        break
-
-                newsIndex = newsArray.index(news)
-                nextDist = 0
-                while newsIndex != (newsArray.index(LAST_STRING) - 1):
-                    newsIndex += 1
-                    nextDist += 1
-
-                    #print("next", newsIndex, nextDist)
-                    if len(newsArray[newsIndex].strip()) > 0:
-                        nextDist -= len(newsArray)
-                        break
-
-                #print(prevDist, nextDist)
-                if prevDist >= 0 and nextDist >= 0:
-                    newsTitles.append(news.strip())
-                else:
-                    if prevDist < nextDist:
-                        newsTitles[-1] = "{0} | {1}".format(newsTitles[-1], newsTitle)
-                    else:
-                        newsTitles.append("{0} | {1}".format(newsTitle, next(newsIter)))
-
-            else:
-                newsTitles.append(news.strip())
+            newsTitles.append(newsTitle)
 
         news = next(newsIter)
 
@@ -170,6 +193,7 @@ def checkNaverNews(newsDic):
         newsTop = bsObj.find(id="_MM_FLICK_FIRST_PANEL")
         newsItems = newsTop.div.ul
         newsText = newsItems.get_text()
+        #print(newsText)
 
         newsTitles = buildNewsTitle(newsText)
         if len(newsTitles) > 0:
