@@ -37,8 +37,6 @@ def saveWebPage(url):
     file.close()
 
 def removeOldMinValue(newsDic, numOfLatestNews):
-    global DATABASE_MAX_SIZE
-
     guardRegion = numOfLatestNews * 2
     if guardRegion >= DATABASE_MAX_SIZE:
         print("Error", numOfLatestNews)
@@ -74,7 +72,6 @@ SHORT_STRING_SIZE = 10
 MAX_STRING_SIZE = 40
 
 def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
-    global LAST_STRING
     newsIndex = newsArray.index(news)
     prevDist = 0
 
@@ -124,8 +121,6 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
     return concatenatedNewsTitle
 
 def buildNewsTitle(newsText):
-    global LAST_STRING
-
     newsArray = newsText.splitlines()
     newsArray.append(LAST_STRING)
 
@@ -210,7 +205,6 @@ def onTimer():
     global naverNews
 
     global count
-    global CHECKING_TIMER_PERIOD
 
     count += 1
     print(count, "th", "Check,", datetime.datetime.now())
