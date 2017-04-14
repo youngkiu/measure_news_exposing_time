@@ -83,7 +83,6 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
         #print("prev", newsIndex, prevDist)
         if len(newsArray[newsIndex].strip()) > 0:
             prevDist -= len(newsArray)
-            prevNews = newsArray[newsIndex]
             break
 
     newsIndex = newsArray.index(news)
@@ -95,7 +94,6 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
         #print("next", newsIndex, nextDist)
         if len(newsArray[newsIndex].strip()) > 0:
             nextDist -= len(newsArray)
-            nextNews = newsArray[newsIndex]
             break
 
     newsTitle = news.strip()
@@ -109,9 +107,9 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
         else:
             newsIndex = newsArray.index(news)
             while newsIndex != (newsArray.index(LAST_STRING) - 1):
+                newsIndex += 1
                 nextNews = next(newsIter)
-
-                if len(newsArray[newsIndex].strip()) > 0:
+                if len(nextNews.strip()) > 0:
                     break
 
             nextNewsTitle = nextNews.strip()
