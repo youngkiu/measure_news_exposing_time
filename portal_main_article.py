@@ -70,6 +70,8 @@ def removeOldMinValue(newsDic, numOfLatestNews):
         numOfNews -= 1
 
 LAST_STRING = "Last String"
+SHORT_STRING_SIZE = 10
+MAX_STRING_SIZE = 40
 
 def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
     global LAST_STRING
@@ -82,7 +84,7 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
 
         #print("prev", newsIndex, prevDist)
         if len(newsArray[newsIndex].strip()) > 0:
-            prevDist -= len(newsArray)
+            prevDist = ((prevDist - len(newsArray)) * MAX_STRING_SIZE) - len(newsArray[newsIndex])
             break
 
     newsIndex = newsArray.index(news)
@@ -93,7 +95,7 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
 
         #print("next", newsIndex, nextDist)
         if len(newsArray[newsIndex].strip()) > 0:
-            nextDist -= len(newsArray)
+            nextDist = ((nextDist - len(newsArray)) * MAX_STRING_SIZE) - len(newsArray[newsIndex])
             break
 
     newsTitle = news.strip()
@@ -114,7 +116,7 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
 
             nextNewsTitle = nextNews.strip()
 
-            if len(nextNewsTitle) < 10:
+            if len(nextNewsTitle) < SHORT_STRING_SIZE:
                 concatenatedNewsTitle = "{0} | {1}".format(newsTitle, concatenateNewsTitle(nextNews, newsArray, newsIter, newsTitles))
             else:
                 concatenatedNewsTitle = "{0} | {1}".format(newsTitle, nextNewsTitle)
@@ -135,7 +137,7 @@ def buildNewsTitle(newsText):
         newsTitle = news.strip()
 
         if len(newsTitle) > 0:
-            if len(newsTitle) < 10:
+            if len(newsTitle) < SHORT_STRING_SIZE:
                 newsTitle = concatenateNewsTitle(news, newsArray, newsIter, newsTitles)
 
             newsTitles.append(newsTitle)
