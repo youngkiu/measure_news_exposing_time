@@ -68,31 +68,34 @@ def removeOldMinValue(newsDic, numOfLatestNews):
         numOfNews -= 1
 
 LAST_STRING = "Last String"
-SHORT_STRING_SIZE = 9
-MAX_STRING_SIZE = 31
+SHORT_STR_LEN = 9
+MAX_STR_LEN = 36
+MIN_STR_LEN = MAX_STR_LEN
 
 def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
+    global MIN_STR_LEN
+
     newsIndex = newsArray.index(news)
     prevDist = 0
 
     while newsIndex != 0:
         newsIndex -= 1
-        prevDist += MAX_STRING_SIZE
+        prevDist += MAX_STR_LEN
 
         #print("prev", newsIndex, prevDist)
         if len(newsArray[newsIndex].strip()) > 0:
-            prevDist = prevDist - (len(newsArray) * MAX_STRING_SIZE) - len(newsArray[newsIndex])
+            prevDist = prevDist - (len(newsArray) * MAX_STR_LEN) - len(newsArray[newsIndex])
             break
 
     newsIndex = newsArray.index(news)
     nextDist = 0
     while newsIndex != (newsArray.index(LAST_STRING) - 1):
         newsIndex += 1
-        nextDist += MAX_STRING_SIZE
+        nextDist += MAX_STR_LEN
 
         #print("next", newsIndex, nextDist)
         if len(newsArray[newsIndex].strip()) > 0:
-            nextDist = nextDist - (len(newsArray) * MAX_STRING_SIZE) - len(newsArray[newsIndex])
+            nextDist = nextDist - (len(newsArray) * MAX_STR_LEN) - len(newsArray[newsIndex])
             break
 
     newsTitle = news.strip()
@@ -103,6 +106,10 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
     else:
         if prevDist < nextDist:
             concatenatedNewsTitle = "{0} | {1}".format(newsTitles.pop(), newsTitle)
+
+            if len(newsTitle) >= SHORT_STR_LEN and \
+               len(newsTitle) < MIN_STR_LEN:
+                MIN_STR_LEN = len(newsTitle)
         else:
             newsIndex = newsArray.index(news)
             while newsIndex != (newsArray.index(LAST_STRING) - 1):
@@ -113,14 +120,20 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
 
             nextNewsTitle = nextNews.strip()
 
-            if len(nextNewsTitle) < SHORT_STRING_SIZE:
+            if len(nextNewsTitle) < SHORT_STR_LEN:
                 concatenatedNewsTitle = "{0} | {1}".format(newsTitle, concatenateNewsTitle(nextNews, newsArray, newsIter, newsTitles))
             else:
                 concatenatedNewsTitle = "{0} | {1}".format(newsTitle, nextNewsTitle)
 
+                if len(nextNewsTitle) >= SHORT_STR_LEN and \
+                   len(nextNewsTitle) < MIN_STR_LEN:
+                    MIN_STR_LEN = len(nextNewsTitle)
+
     return concatenatedNewsTitle
 
 def buildNewsTitle(newsText):
+    global MAX_STR_LEN
+    
     newsArray = newsText.splitlines()
     newsArray.append(LAST_STRING)
 
@@ -132,10 +145,12 @@ def buildNewsTitle(newsText):
         newsTitle = news.strip()
 
         if len(newsTitle) > 0:
-            if len(newsTitle) < SHORT_STRING_SIZE:
+            if len(newsTitle) < SHORT_STR_LEN:
                 newsTitle = concatenateNewsTitle(news, newsArray, newsIter, newsTitles)
+                
+            if len(newsTitle) > MAX_STR_LEN:
+                MAX_STR_LEN = len(newsTitle)
 
-            #print(newsTitle, len(newsTitle))
             newsTitles.append(newsTitle)
 
         news = next(newsIter)
@@ -212,6 +227,8 @@ def onTimer():
     
     checkDaumNews(daumNews)
     checkNaverNews(naverNews)
+
+    print("[Debug] News Title Length - Min({0}), Max({1})".format(MIN_STR_LEN, MAX_STR_LEN))
 
     print("")
 
