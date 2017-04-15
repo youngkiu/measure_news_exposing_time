@@ -29,10 +29,16 @@ def saveWebPage(url):
 
     try:
         html = urlopen(url)
+
+        try:
+            page = html.read()
+        except Exception as err:
+            print(err)
+        else:
+            file.write(page)
+
     except Exception as err:
         print(err)
-    else:
-        file.write(html.read())
     
     file.close()
 
