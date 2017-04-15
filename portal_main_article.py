@@ -68,8 +68,8 @@ def removeOldMinValue(newsDic, numOfLatestNews):
         numOfNews -= 1
 
 LAST_STRING = "Last String"
-SHORT_STRING_SIZE = 10
-MAX_STRING_SIZE = 40
+SHORT_STRING_SIZE = 9
+MAX_STRING_SIZE = 31
 
 def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
     newsIndex = newsArray.index(news)
@@ -135,6 +135,7 @@ def buildNewsTitle(newsText):
             if len(newsTitle) < SHORT_STRING_SIZE:
                 newsTitle = concatenateNewsTitle(news, newsArray, newsIter, newsTitles)
 
+            #print(newsTitle, len(newsTitle))
             newsTitles.append(newsTitle)
 
         news = next(newsIter)
