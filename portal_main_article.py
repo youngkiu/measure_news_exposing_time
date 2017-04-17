@@ -75,7 +75,7 @@ def removeOldMinValue(newsDic, numOfLatestNews):
 
 LAST_STRING = "Last String"
 SHORT_STR_LEN = 9
-MAX_STR_LEN = 36
+MAX_STR_LEN = 39
 MIN_STR_LEN = MAX_STR_LEN
 
 def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
