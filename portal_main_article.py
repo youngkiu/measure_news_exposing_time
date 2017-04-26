@@ -74,7 +74,7 @@ def removeOldMinValue(newsDic, numOfLatestNews):
         numOfNews -= 1
 
 LAST_STRING = "Last String"
-SHORT_STR_LEN = 9
+SHORT_STR_LEN = 8
 MAX_STR_LEN = 39
 MIN_STR_LEN = MAX_STR_LEN
 
@@ -210,7 +210,7 @@ def checkNaverNews(newsDic):
         newsTop = bsObj.find(id="_MM_FLICK_FIRST_PANEL")
         newsItems = newsTop.div.ul
         newsText = newsItems.get_text()
-        #print(newsText)
+        print(newsText)
 
         newsTitles = buildNewsTitle(newsText)
         if len(newsTitles) > 0:
