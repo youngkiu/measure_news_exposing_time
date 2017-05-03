@@ -111,7 +111,10 @@ def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
         concatenatedNewsTitle = newsTitle
     else:
         if prevDist < nextDist:
-            concatenatedNewsTitle = "{0} | {1}".format(newsTitles.pop(), newsTitle)
+            if len(newsTitles) > 0:
+                concatenatedNewsTitle = "{0} | {1}".format(newsTitles.pop(), newsTitle)
+            else:
+                concatenatedNewsTitle = newsTitle
 
             if len(newsTitle) >= SHORT_STR_LEN and \
                len(newsTitle) < MIN_STR_LEN:
@@ -188,7 +191,7 @@ def checkDaumNews(newsDic):
         bsObj = BeautifulSoup(html, "html.parser")
 
         newsTop = bsObj.find(id="channel_news1_top")
-        newsItems = newsTop.div.ul
+        newsItems = newsTop.div.ul.findNext('ul')
         newsText = newsItems.get_text()
 
         newsTitles = buildNewsTitle(newsText)
@@ -208,9 +211,8 @@ def checkNaverNews(newsDic):
         bsObj = BeautifulSoup(html, "html.parser")
 
         newsTop = bsObj.find(id="_MM_FLICK_FIRST_PANEL")
-        newsItems = newsTop.div.ul
+        newsItems = newsTop.div.ul.findNext('ul')
         newsText = newsItems.get_text()
-        print(newsText)
 
         newsTitles = buildNewsTitle(newsText)
         if len(newsTitles) > 0:
