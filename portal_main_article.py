@@ -75,7 +75,7 @@ def removeOldMinValue(newsDic, numOfLatestNews):
 
 LAST_STRING = "Last String"
 SHORT_STR_LEN = 8
-MAX_STR_LEN = 39
+MAX_STR_LEN = 41
 MIN_STR_LEN = MAX_STR_LEN
 
 def concatenateNewsTitle(news, newsArray, newsIter, newsTitles):
@@ -189,18 +189,21 @@ def checkDaumNews(newsDic):
         print(err)
     else:
         bsObj = BeautifulSoup(html, "html.parser")
-
         newsTop = bsObj.find(id="channel_news1_top")
-        newsItems = newsTop.div.ul.findNext('ul')
-        newsText = newsItems.get_text()
 
-        newsTitles = buildNewsTitle(newsText)
-        if len(newsTitles) > 0:
-            updateNewNews(newsDic, newsTitles)
+        newsItems = newsTop.div.ul
+        while newsItems != None:
+            newsText = newsItems.get_text()
+            newsTitles = buildNewsTitle(newsText)
+            if len(newsTitles) == 5:
+                updateNewNews(newsDic, newsTitles)
+                break
+
+            newsItems = newsItems.findNext('ul')
 
 def checkNaverNews(newsDic):
     url = "http://m.naver.com/"
-    
+
     saveWebPage(url)
 
     try:
@@ -209,15 +212,17 @@ def checkNaverNews(newsDic):
         print(err)
     else:
         bsObj = BeautifulSoup(html, "html.parser")
-
         newsTop = bsObj.find(id="_MM_FLICK_FIRST_PANEL")
-        newsItems = newsTop.div.ul.findNext('ul')
-        newsText = newsItems.get_text()
 
-        newsTitles = buildNewsTitle(newsText)
-        if len(newsTitles) > 0:
-            updateNewNews(newsDic, newsTitles)
+        newsItems = newsTop.div.ul
+        while newsItems != None:
+            newsText = newsItems.get_text()
+            newsTitles = buildNewsTitle(newsText)
+            if len(newsTitles) == 5:
+                updateNewNews(newsDic, newsTitles)
+                break
 
+            newsItems = newsItems.findNext('ul')
 
 daumNews = {}
 naverNews = {}
